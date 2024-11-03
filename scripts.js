@@ -1,24 +1,22 @@
-// Animation
+// Animation for elements revealing on scroll
 function revealOnScroll() {
-    const fadeIns = document.querySelectorAll('.fade-in');
-    fadeIns.forEach((el) => {
-      const scrollPosition = window.innerHeight + window.scrollY;
-      const elementPosition = el.getBoundingClientRect().top + window.scrollY;
-  
-      if (scrollPosition > elementPosition) {
-        el.classList.add('show');
-      } else {
-        el.classList.remove('show'); 
-      }
-    });
-  }
+  const fadeIns = document.querySelectorAll('.fade-in');
+  fadeIns.forEach((el) => {
+    const scrollPosition = window.innerHeight + window.scrollY;
+    const elementPosition = el.getBoundingClientRect().top + window.scrollY;
 
-  window.addEventListener('scroll', revealOnScroll);
+    if (scrollPosition > elementPosition) {
+      el.classList.add('show');
+    } else {
+      el.classList.remove('show'); 
+    }
+  });
+}
 
-  document.addEventListener('DOMContentLoaded', revealOnScroll);
-  
+window.addEventListener('scroll', revealOnScroll);
+document.addEventListener('DOMContentLoaded', revealOnScroll);
 
-//typing effect
+// Typing effect for dynamic text
 const words = ["Passionate Programmer", "Creative Developer", "Problem Solver"];
 let wordIndex = 0;
 let letterIndex = 0;
@@ -28,134 +26,153 @@ const typingSpeed = 150;
 const pauseAfterTyping = 1000; 
 
 function typeEffect() {
-    const dynamicText = document.getElementById("dynamic-text");
+  const dynamicText = document.getElementById("dynamic-text");
 
-    if (!isDeleting && letterIndex < words[wordIndex].length) {
-        currentWord += words[wordIndex][letterIndex];
-        letterIndex++;
-        dynamicText.textContent = currentWord;
-        setTimeout(typeEffect, typingSpeed);
-    } else if (isDeleting && letterIndex > 0) {
-        currentWord = currentWord.slice(0, -1);
-        letterIndex--;
-        dynamicText.textContent = currentWord;
-        setTimeout(typeEffect, typingSpeed / 2); 
-    } else if (!isDeleting && letterIndex === words[wordIndex].length) {
-        isDeleting = true;
-        setTimeout(typeEffect, pauseAfterTyping);
-    } else if (isDeleting && letterIndex === 0) {
-        isDeleting = false;
-        wordIndex = (wordIndex + 1) % words.length;
-        setTimeout(typeEffect, typingSpeed);
-    }
+  if (!isDeleting && letterIndex < words[wordIndex].length) {
+      currentWord += words[wordIndex][letterIndex];
+      letterIndex++;
+      dynamicText.textContent = currentWord;
+      setTimeout(typeEffect, typingSpeed);
+  } else if (isDeleting && letterIndex > 0) {
+      currentWord = currentWord.slice(0, -1);
+      letterIndex--;
+      dynamicText.textContent = currentWord;
+      setTimeout(typeEffect, typingSpeed / 2); 
+  } else if (!isDeleting && letterIndex === words[wordIndex].length) {
+      isDeleting = true;
+      setTimeout(typeEffect, pauseAfterTyping);
+  } else if (isDeleting && letterIndex === 0) {
+      isDeleting = false;
+      wordIndex = (wordIndex + 1) % words.length;
+      setTimeout(typeEffect, typingSpeed);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", typeEffect);
 
-//modal
+// Modal slideshow functionality
 let slideIndex = 0;
-document.querySelectorAll(".project-card").forEach(card => {
-  card.addEventListener("click", () => {
-      const projectName = card.getAttribute("data-name");
-      const githubLink = card.getAttribute("data-github");
-      const images = card.getAttribute("data-images").split(",");
-      const descriptions = card.getAttribute("data-description").split(",");
+let slideTimer; // Global timer variable for controlling automatic slideshow speed
 
-      openModal(projectName, descriptions, githubLink, images);
-  });
+// Function to show slides automatically
+function showSlides() {
+const slides = document.getElementsByClassName("slide");
+
+// Remove active class from all slides
+Array.from(slides).forEach(slide => {
+    slide.classList.remove("active");
 });
 
-function showSlides() {
-  const slides = document.getElementsByClassName("slide");
-
-  // Remove active class from all slides
-  Array.from(slides).forEach(slide => {
-      slide.classList.remove("active");
-  });
-  
-  // Increment slide index and loop back to the beginning if necessary
-  slideIndex++;
-  if (slideIndex > slides.length) {
-      slideIndex = 1;
-  }
-
-  // Add active class to the current slide
-  slides[slideIndex - 1].classList.add("active");
-
-  // Set a timer for the next slide
-  setTimeout(showSlides, 3000); 
+// Increment slide index and loop back if necessary
+slideIndex++;
+if (slideIndex > slides.length) {
+    slideIndex = 1;
 }
 
+// Activate the current slide
+slides[slideIndex - 1].classList.add("active");
+
+// Clear any existing timer to avoid overlapping intervals
+clearTimeout(slideTimer);
+
+// Set a new timer for the next slide
+slideTimer = setTimeout(showSlides, 3000); 
+}
+
+// Function to open the modal with project details
 function openModal(projectName, projectDescriptions, githubLink, images) {
-  document.getElementById("projectDetailModal").style.display = "flex";
-  document.getElementById("projectName").innerText = projectName;
+document.getElementById("projectDetailModal").style.display = "flex";
+document.getElementById("projectName").innerText = projectName;
 
-  // Set up the GitHub link
-  const githubLinkElement = document.querySelector(".github-link");
-  githubLinkElement.href = githubLink;
+// Set up the GitHub link
+const githubLinkElement = document.querySelector(".github-link");
+githubLinkElement.href = githubLink;
 
-  // Clear previous images and add new ones
-  const slidesContainer = document.querySelector(".slideshow-container");
-  slidesContainer.innerHTML = "";
+// Clear previous images and add new ones
+const slidesContainer = document.querySelector(".slideshow-container");
+slidesContainer.innerHTML = "";
 
-  images.forEach((imageSrc, index) => {
-      const imgElement = document.createElement("img");
-      imgElement.src = imageSrc.trim(); 
-      imgElement.classList.add("slide");
-      if (index === 0) imgElement.classList.add("active"); 
-      slidesContainer.appendChild(imgElement);
-  });
+images.forEach((imageSrc, index) => {
+    const imgElement = document.createElement("img");
+    imgElement.src = imageSrc.trim(); 
+    imgElement.classList.add("slide");
+    if (index === 0) imgElement.classList.add("active"); 
+    slidesContainer.appendChild(imgElement);
+});
 
-  // Process descriptions
-  const descriptionSlidesContainer = document.querySelector(".description-slideshow");
-  const dotsContainer = descriptionSlidesContainer.querySelector(".dots");
-  descriptionSlidesContainer.querySelectorAll(".description-slide").forEach(slide => slide.remove());
-  dotsContainer.innerHTML = "";
+// Process descriptions
+const descriptionSlidesContainer = document.querySelector(".description-slideshow");
+const dotsContainer = descriptionSlidesContainer.querySelector(".dots");
+descriptionSlidesContainer.querySelectorAll(".description-slide").forEach(slide => slide.remove());
+dotsContainer.innerHTML = "";
 
-  projectDescriptions.forEach((description, index) => {
-      const descriptionSlide = document.createElement("p");
-      descriptionSlide.classList.add("description-slide");
-      if (index === 0) descriptionSlide.classList.add("active"); 
-      descriptionSlide.textContent = description.trim();
-      descriptionSlidesContainer.insertBefore(descriptionSlide, dotsContainer);
+projectDescriptions.forEach((description, index) => {
+    const descriptionSlide = document.createElement("p");
+    descriptionSlide.classList.add("description-slide");
+    if (index === 0) descriptionSlide.classList.add("active"); 
+    descriptionSlide.textContent = description.trim();
+    descriptionSlidesContainer.insertBefore(descriptionSlide, dotsContainer);
 
-      // Add a corresponding dot for each slide
-      const dot = document.createElement("span");
-      dot.classList.add("dot");
-      if (index === 0) dot.classList.add("active"); 
-      dot.setAttribute("onclick", `showDescriptionSlide(${index})`);
-      dotsContainer.appendChild(dot);
-  });
+    // Add a corresponding dot for each slide
+    const dot = document.createElement("span");
+    dot.classList.add("dot");
+    if (index === 0) dot.classList.add("active"); 
+    dot.setAttribute("onclick", `showDescriptionSlide(${index})`);
+    dotsContainer.appendChild(dot);
+});
 
-  showSlides();
+// Initialize the slideshow
+clearTimeout(slideTimer); // Clear any existing slideshow timer
+slideIndex = 0; // Reset slide index
+showSlides();
 }
 
+// Function to close the modal
 function closeModal() {
-    document.getElementById("projectDetailModal").style.display = "none";
+  document.getElementById("projectDetailModal").style.display = "none";
+  clearTimeout(slideTimer); // Stop the automatic slideshow when modal is closed
 }
 
+// Project cards click event for opening modal
+document.querySelectorAll(".project-card").forEach(card => {
+card.addEventListener("click", () => {
+    const projectName = card.getAttribute("data-name");
+    const githubLink = card.getAttribute("data-github");
+    const images = card.getAttribute("data-images").split(",");
+    const descriptions = card.getAttribute("data-description").split(",");
+
+    openModal(projectName, descriptions, githubLink, images);
+});
+});
+
+// Description slide controls
 let currentDescriptionSlide = 0;
 
 function showDescriptionSlide(n) {
-  const slides = document.getElementsByClassName("description-slide");
-  const dots = document.getElementsByClassName("dot");
+const slides = document.getElementsByClassName("description-slide");
+const dots = document.getElementsByClassName("dot");
 
-  if (n >= slides.length) currentDescriptionSlide = 0;
-  else if (n < 0) currentDescriptionSlide = slides.length - 1;
-  else currentDescriptionSlide = n;
+if (n >= slides.length) currentDescriptionSlide = 0;
+else if (n < 0) currentDescriptionSlide = slides.length - 1;
+else currentDescriptionSlide = n;
 
-  // Hide all slides and remove active class from dots
-  Array.from(slides).forEach((slide) => slide.classList.remove("active"));
-  Array.from(dots).forEach((dot) => dot.classList.remove("active"));
+// Hide all slides and remove active class from dots
+Array.from(slides).forEach((slide) => slide.classList.remove("active"));
+Array.from(dots).forEach((dot) => dot.classList.remove("active"));
 
-  // Show the current slide and activate the corresponding dot
-  slides[currentDescriptionSlide].classList.add("active");
-  dots[currentDescriptionSlide].classList.add("active");
+// Show the current slide and activate the corresponding dot
+slides[currentDescriptionSlide].classList.add("active");
+dots[currentDescriptionSlide].classList.add("active");
 }
 
+// Arrow navigation for description slides
 function changeDescriptionSlide(n) {
-  showDescriptionSlide(currentDescriptionSlide + n);
+showDescriptionSlide(currentDescriptionSlide + n);
+
+// Reset the slideshow timer when navigating manually
+clearTimeout(slideTimer);
+slideTimer = setTimeout(showSlides, 3000);
 }
 
-// Initialize the first slide
+// Initialize the first description slide
 showDescriptionSlide(currentDescriptionSlide);
